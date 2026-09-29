@@ -1,0 +1,17 @@
+node_modules/
+dist/
+config.json
+.local/
+.secrets/
+.env
+.env.*
+!.env.example
+data/
+storage/
+workspace/
+workspaces/
+*.sqlite*
+*.log
+*.pem
+*.key
+coverage/

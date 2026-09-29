@@ -1,0 +1,36 @@
+{
+  "name": "rajesh-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx --test test/*.test.ts",
+    "start": "node --import tsx src/main.ts",
+    "check": "tsc --noEmit && tsc -p tsconfig.tools.json",
+    "setup": "node scripts/init.mjs",
+    "doctor": "node --import tsx scripts/doctor.ts",
+    "pair:whatsapp": "node --import tsx scripts/pair-whatsapp.ts",
+    "audit:export": "node scripts/audit-export.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "baileys": "7.0.0-rc14",
+    "cron-parser": "5.10.0",
+    "discord.js": "14.27.0",
+    "pino": "10.3.1",
+    "smol-toml": "1.8.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "26.5.0",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2"
+  },
+  "version": "0.1.0",
+  "description": "Self-hosted Discord and WhatsApp task runner for Codex",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "packageManager": "pnpm@10.29.2"
+}

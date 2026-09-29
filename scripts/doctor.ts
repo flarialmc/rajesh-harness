@@ -1,0 +1,13 @@
+import { loadConfig } from '../src/config.js';
+import { probe } from '../src/update.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const config=loadConfig();
+for(const path of Object.values(config.workspaces))if(!existsSync(path))throw new Error('A configured workspace directory does not exist');
+const credentialsPath=join(config.secretsDir,'credentials.json');
+const credentials=existsSync(credentialsPath)?JSON.parse(readFileSync(credentialsPath,'utf8')):{discord:{}};
+for(const route of config.routes)if(typeof credentials.discord?.[route.account]!=='string'||!credentials.discord[route.account])throw new Error(`Missing Discord credential for account ${route.account}`);
+if(!config.routes.length&&!config.whatsappGroup)throw new Error('Configure at least one Discord route or WhatsApp group');
+if(config.whatsappGroup&&!existsSync(join(config.secretsDir,'whatsapp','creds.json'))&&!existsSync(join(config.dataDir,'state.sqlite')))throw new Error('Pair WhatsApp before starting');
+await probe(config.codex,config);
+console.log('Configuration, authentication, protocol and configured models passed. No agent turn or chat message was sent.');

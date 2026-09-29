@@ -1,0 +1,20 @@
+{
+  "dataDir": "/absolute/path/to/private/data",
+  "secretsDir": "/absolute/path/to/private/secrets",
+  "codex": "/absolute/path/to/codex",
+  "codexHome": "/absolute/path/to/private/codex-home",
+  "workspaces": { "default": "/absolute/path/to/projects" },
+  "routes": [{
+    "account": "main",
+    "guild": "YOUR_DISCORD_GUILD_ID",
+    "channel": "YOUR_DISCORD_CHANNEL_ID",
+    "workspace": "default",
+    "model": "YOUR_MODEL_ID",
+    "effort": "medium",
+    "requireMention": true
+  }],
+  "whatsappGroup": "",
+  "concurrency": 2,
+  "timezone": "UTC",
+  "agent": { "name": "Rajesh", "sandbox": "workspace-write" }
+}
