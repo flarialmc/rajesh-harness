@@ -2,6 +2,8 @@
 
 Run Codex tasks from Discord or a WhatsApp group on your own machine. Each conversation keeps its Codex thread, queued input, delivery state, and source revision across restarts.
 
+The agent can also edit and publish changes to its own harness through a validated, versioned workflow. New conversations pick up the updated code while existing conversations keep running on their pinned revision.
+
 The runtime uses the [Codex App Server](https://learn.chatgpt.com/docs/app-server) over stdio. It does not include Codex, an OpenAI account, or credentials.
 
 ## What it does
@@ -14,6 +16,21 @@ The runtime uses the [Codex App Server](https://learn.chatgpt.com/docs/app-serve
 - Pins conversations to validated source snapshots. New conversations can use an updated runtime while old ones keep their version.
 
 This public edition has no organization-specific incident automation, private workspace instructions, voice-note shortcuts, account-usage dashboards, deployment credentials, or imported conversation history.
+
+## Self-editing without replacing active conversations
+
+You can ask Rajesh to change the harness itself from chat: add a tool, fix an adapter, or change how tasks behave. The agent has dedicated MCP tools to prepare and publish those changes.
+
+1. `prepare_self_edit` creates an editable draft of the latest validated source and configuration, owned by the requesting task.
+2. The agent edits that draft. Saved runtime revisions and conversation bindings stay untouched.
+3. `publish_self_edit` installs the locked dependencies, runs TypeScript checks and tests, checks runtime exports, and probes Codex compatibility. It rejects stale drafts and configuration changes that require a restart.
+4. After validation, publication records a Git commit and selects the new source snapshot for new conversations. Existing conversations retain their source revision, configuration, and resolved Codex executable path, including after a service restart.
+
+For example, if two conversations are running when an adapter fix is published, both continue with their existing code. A conversation started afterward gets the fix. The conversation that published the change also stays on its original revision.
+
+`runtime_status` exposes the current conversation's binding, the latest published revision, validation failures, and bootstrap changes that require a restart. Failed validation keeps the last accepted revision selected. Source hashes detect modifications to saved snapshots, and stale-draft checks prevent one task from overwriting a newer publication.
+
+This update path covers task runtime behavior. Connection setup and supervisor/bootstrap changes still require a controlled restart. Runtime snapshots contain private operator configuration and stay local; the generated source Git commits exclude `config.json`.
 
 ## Requirements
 
@@ -85,7 +102,7 @@ The first start imports the paired session into private SQLite storage. Pairing 
 
 Back up `dataDir`, `secretsDir`, and `codexHome` privately. Never publish runtime snapshots, database files, transcripts, or generated skill/memory repositories. Runtime snapshots include operator configuration even though runtime Git commits exclude it.
 
-The supervisor validates changed source with pnpm, TypeScript, tests, and a Codex protocol probe. Existing tasks retain their saved revision. The MCP tools `prepare_self_edit` and `publish_self_edit` support task-owned drafts with stale-draft checks. Changes to connections, bootstrap code, or workspace setup require a controlled service restart; schedule timezone changes also take effect on restart.
+See [self-editing](#self-editing-without-replacing-active-conversations) for the draft and publication workflow. Changes to connections, bootstrap code, workspace setup, or the schedule timezone require a controlled service restart.
 
 Use your process manager to run `pnpm start` with the repository as its working directory. SIGTERM shuts down connections and marks active work interrupted. On restart, uncertain tool execution or outgoing deliveries are not blindly replayed. Reply to an interrupted task to continue. Upgrade the Codex binary yourself after checking compatibility; there is no automatic binary updater.
 
